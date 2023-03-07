@@ -1,0 +1,7 @@
+* Readme
+
+** Overview 
+Tutorial Youtube: [[https://www.youtube.com/watch?v=RVFAyFWO4go&t=926s][React JS Full Course for Beginners | Complete All-in-One Tutorial | 9 Hours ]]
+
+** npm start
+[[localhost:3000][localhost:3000]]
