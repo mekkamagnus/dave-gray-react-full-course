@@ -1,12 +1,11 @@
-export default function Header() {
-  // const headerStyle = {
-  //   backgroundColor: 'forestgreen',
-  //   color: '#333',
-  // };
-
+export default function Header({ title }) {
   return (
     <header>
-      <h1>Groceries List</h1>
+      <h1>{title}</h1>
     </header>
   );
 }
+
+Header.defaultProps = {
+  title: 'Default Title',
+};
