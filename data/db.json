@@ -1,0 +1,39 @@
+{
+  "items": [
+    {
+      "id": 4,
+      "checked": true,
+      "item": "iced tea"
+    },
+    {
+      "id": 5,
+      "checked": false,
+      "item": "ice cream"
+    },
+    {
+      "id": 10,
+      "checked": false,
+      "item": "protein bars"
+    },
+    {
+      "id": 12,
+      "checked": false,
+      "item": "pop-tarts"
+    },
+    {
+      "id": 13,
+      "checked": false,
+      "item": "lemons"
+    },
+    {
+      "id": 14,
+      "checked": true,
+      "item": "snails"
+    },
+    {
+      "id": 15,
+      "checked": false,
+      "item": "reeses pieces"
+    }
+  ]
+}

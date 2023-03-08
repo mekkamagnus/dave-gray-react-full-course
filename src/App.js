@@ -4,35 +4,89 @@ import SearchItem from './SearchItem';
 import Content from './Content';
 import Footer from './Footer';
 import { useState, useEffect } from 'react';
+import apiRequest from './apiRequest';
 
 function App() {
-  const [items, setItems] = useState(
-    JSON.parse(localStorage.getItem('shoppinglist')),
-  );
+  const API_URL = 'http://192.168.1.3:3500/items';
+  // const API_URL = 'https://28fb-61-216-157-181.jp.ngrok.io/items';
+
+  const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState('');
   const [search, setSearch] = useState('');
+  const [fetchError, setFetchError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    localStorage.setItem('shoppinglist', JSON.stringify(items));
-  }, [items]);
+    const fetchItems = async () => {
+      try {
+        const getOptions = {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'null',
+          },
+        };
+        const response = await fetch(API_URL, getOptions);
+        if (!response.ok) throw Error('Did not receive expected data');
+        const listItems = await response.json();
+        setItems(listItems);
+        setFetchError(null);
+      } catch (err) {
+        setFetchError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    setTimeout(() => {
+      fetchItems();
+    }, 2000);
+  }, []);
 
-  function addItem(item) {
+  async function addItem(item) {
     const id = items.length ? items[items.length - 1].id + 1 : 1;
     const myNewItem = { id, checked: false, item };
     const listItems = [...items, myNewItem];
     setItems(listItems);
+
+    const postOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'null',
+      },
+      body: JSON.stringify(myNewItem),
+    };
+    const result = await apiRequest(API_URL, postOptions);
+    if (result) setFetchError(result);
   }
 
-  function handleCheck(id) {
+  async function handleCheck(id) {
     const listItems = items.map(item =>
       item.id == id ? { ...item, checked: !item.checked } : item,
     );
     setItems(listItems);
+
+    const myItem = listItems.filter(item => item.id === id);
+    const updateOptions = {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'null',
+      },
+      body: JSON.stringify({ checked: myItem[0].checked }),
+    };
+    const requestURL = `${API_URL}/${id}`;
+    const result = await apiRequest(requestURL, updateOptions);
+    if (result) setFetchError(result);
   }
 
-  function handleDelete(id) {
+  async function handleDelete(id) {
     const listItems = items.filter(item => item.id !== id);
     setItems(listItems);
+    const deleteOptions = { method: 'DELETE' };
+    const requestURL = `${API_URL}/${id}`;
+    const result = await apiRequest(requestURL, deleteOptions);
+    if (result) setFetchError(result);
   }
   function handleSubmit(event) {
     event.preventDefault();
@@ -50,13 +104,19 @@ function App() {
         handleSubmit={handleSubmit}
       />
       <SearchItem search={search} setSearch={setSearch} />
-      <Content
-        items={items.filter(item =>
-          item.item.toLowerCase().includes(search.toLowerCase()),
+      <main>
+        {isLoading && <p>Loading Items...</p>}
+        {fetchError && <p style={{ color: 'red' }}>{`Error: ${fetchError}`}</p>}
+        {!fetchError && !isLoading && (
+          <Content
+            items={items.filter(item =>
+              item.item.toLowerCase().includes(search.toLowerCase()),
+            )}
+            handleCheck={handleCheck}
+            handleDelete={handleDelete}
+          />
         )}
-        handleCheck={handleCheck}
-        handleDelete={handleDelete}
-      />
+      </main>
       <Footer length={items.length} />
     </div>
   );
