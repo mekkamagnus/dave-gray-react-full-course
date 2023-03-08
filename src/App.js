@@ -6,36 +6,33 @@ import Footer from './Footer';
 import { useState, useEffect } from 'react';
 
 function App() {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(
+    JSON.parse(localStorage.getItem('shoppinglist')),
+  );
   const [newItem, setNewItem] = useState('');
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    setItems(JSON.parse(localStorage.getItem('shoppinglist')));
-  }, []);
-
-  function setAndSaveItems(newItems) {
-    setItems(newItems);
-    localStorage.setItem('shoppinglist', JSON.stringify(newItems));
-  }
+    localStorage.setItem('shoppinglist', JSON.stringify(items));
+  }, [items]);
 
   function addItem(item) {
     const id = items.length ? items[items.length - 1].id + 1 : 1;
     const myNewItem = { id, checked: false, item };
     const listItems = [...items, myNewItem];
-    setAndSaveItems(listItems);
+    setItems(listItems);
   }
 
   function handleCheck(id) {
     const listItems = items.map(item =>
       item.id == id ? { ...item, checked: !item.checked } : item,
     );
-    setAndSaveItems(listItems);
+    setItems(listItems);
   }
 
   function handleDelete(id) {
     const listItems = items.filter(item => item.id !== id);
-    setAndSaveItems(listItems);
+    setItems(listItems);
   }
   function handleSubmit(event) {
     event.preventDefault();
